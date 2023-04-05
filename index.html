@@ -34,10 +34,10 @@
             document.getElementById("temperature").textContent =
               temperature.toFixed(2);
 
+            console.log(event);
+
             // Perform localization calculations here...
           });
-
-          console.log(device);
         } catch (error) {
           console.error(`Error: ${error}`);
         }
