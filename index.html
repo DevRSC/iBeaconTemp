@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Web BLE Scan Example</title>
+  </head>
+  <body>
+    <h1>Web BLE Scan Example</h1>
+
+    <p>Temperature: <span id="temperature"></span></p>
+
+    <script>
+      const DEVICE_NAME = "BC011"; // The name of the iBeacon device to scan for
+      const SERVICE_UUID = "fda50693-a4e2-4fb1-afcf-c6eb07647825"; // The UUID of the iBeacon service
+      const TEMPERATURE_CHAR_UUID = "2a6e"; // The UUID of the temperature characteristic
+
+      async function startScan() {
+        try {
+          const device = await navigator.bluetooth.requestLEScan({
+            filters: [{ name: DEVICE_NAME }],
+            services: [SERVICE_UUID],
+          });
+
+          device.addEventListener("advertisementreceived", async (event) => {
+            // Get the temperature characteristic from the advertisement data
+            const data = event.manufacturerData;
+            const temperature = new DataView(data.buffer).getFloat32(6, true);
+
+            // Update the UI with the temperature reading
+            document.getElementById("temperature").textContent =
+              temperature.toFixed(2);
+          });
+        } catch (error) {
+          console.error(`Error: ${error}`);
+        }
+      }
+
+      startScan();
+    </script>
+  </body>
+</html>
