@@ -9,10 +9,14 @@
 
     <p>Temperature: <span id="temperature"></span></p>
 
+    <button id="localizeBtn">Start Localization</button>
+
     <script>
       const DEVICE_NAME = "BC011"; // The name of the iBeacon device to scan for
       const SERVICE_UUID = "fda50693-a4e2-4fb1-afcf-c6eb07647825"; // The UUID of the iBeacon service
       const TEMPERATURE_CHAR_UUID = "2a6e"; // The UUID of the temperature characteristic
+
+      let scanStarted = false;
 
       async function startScan() {
         try {
@@ -29,13 +33,20 @@
             // Update the UI with the temperature reading
             document.getElementById("temperature").textContent =
               temperature.toFixed(2);
+
+            // Perform localization calculations here...
           });
         } catch (error) {
           console.error(`Error: ${error}`);
         }
       }
 
-      startScan();
+      document.getElementById("localizeBtn").addEventListener("click", () => {
+        if (!scanStarted) {
+          startScan();
+          scanStarted = true;
+        }
+      });
     </script>
   </body>
 </html>
