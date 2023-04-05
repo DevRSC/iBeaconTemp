@@ -20,24 +20,32 @@
 
       async function startScan() {
         try {
-          const device = await navigator.bluetooth.requestLEScan({
+          const device = await navigator.bluetooth.requestDevice({
             filters: [{ name: DEVICE_NAME }],
-            services: [SERVICE_UUID],
           });
 
-          device.addEventListener("advertisementreceived", async (event) => {
-            // Get the temperature characteristic from the advertisement data
-            const data = event.manufacturerData;
-            const temperature = new DataView(data.buffer).getFloat32(6, true);
+          const server = await device.gatt.connect();
 
-            // Update the UI with the temperature reading
-            document.getElementById("temperature").textContent =
-              temperature.toFixed(2);
+          const service = await server.getPrimaryService(SERVICE_UUID);
+          const characteristic = await service.getCharacteristic(
+            TEMPERATURE_CHAR_UUID
+          );
 
-            console.log(event);
+          characteristic.startNotifications();
 
-            // Perform localization calculations here...
-          });
+          characteristic.addEventListener(
+            "characteristicvaluechanged",
+            (event) => {
+              // Get the temperature data from the characteristic value
+              const temperature = event.target.value.getFloat32(0, true);
+
+              // Update the UI with the temperature reading
+              document.getElementById("temperature").textContent =
+                temperature.toFixed(2);
+
+              // Perform localization calculations here...
+            }
+          );
         } catch (error) {
           console.error(`Error: ${error}`);
         }
